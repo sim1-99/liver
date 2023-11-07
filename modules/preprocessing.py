@@ -67,7 +67,7 @@ def mean_filter(img, radius: int):
     return filter.Execute(img)
 
 
-def threshold(img, upper: int, lower: int, inside=1, outside=0):
+def threshold(img, upper: int, lower: int, inside: int = 1, outside: int = 0):
     """
     Apply an interval threshold to the input image.
 
@@ -81,10 +81,10 @@ def threshold(img, upper: int, lower: int, inside=1, outside=0):
         lower threshold value
     inside : int, optional
         value to assign to the voxels with GL in [lower, upper];
-        default is 1
+        the default is 1
     outside : int, optional
         value to assign to the voxels with GL outside [lower, upper];
-        default is 0
+        the default is 0
 
     Returns
     -------
@@ -289,7 +289,7 @@ def binary_closing_br(img, radius: int):
     return filter.Execute(img)
 
 
-def erode(img, radius: int, iters=1):
+def erode(img, radius: int, iters: int = 1):
     """
     Perform grayscale erosion on the input image.
 
@@ -300,8 +300,7 @@ def erode(img, radius: int, iters=1):
     radius : int
         neighbourhood radius, must be greater than or equal to 1
     iters : int, optional
-        number of interations to run;
-        default is 1
+        number of interations to run; the default is 1
 
     Returns
     -------
