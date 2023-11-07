@@ -289,7 +289,7 @@ def binary_closing_br(img, radius: int):
     return filter.Execute(img)
 
 
-def erode(img, radius: int, iterations=1):
+def erode(img, radius: int, iters=1):
     """
     Perform grayscale erosion on the input image.
 
@@ -299,7 +299,7 @@ def erode(img, radius: int, iterations=1):
         image or stack of images to erode
     radius : int
         neighbourhood radius, must be greater than or equal to 1
-    iterations : int, optional
+    iters : int, optional
         number of interations to run;
         default is 1
 
@@ -320,7 +320,7 @@ def erode(img, radius: int, iterations=1):
     filter.SetKernelType(sitk.sitkBall)
     filter.SetKernelRadius(int(radius))
 
-    for iteration in range(iterations):
+    for iteration in range(iters):
         img = filter.Execute(img)
 
     return img
