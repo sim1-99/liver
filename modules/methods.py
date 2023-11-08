@@ -145,9 +145,8 @@ def region_growing(img, seed: list, multiplier: float, radius: int,
     return sitk.Cast(connectivity_mask, sitk.sitkUInt8)
 
 
-def pick_random_pixels(
-        img, slice_idx: int, number_of_pixels: int = 10
-        ) -> (np.ndarray, np.ndarray):
+def pick_random_pixels(img, slice_idx: int, number_of_pixels: int
+                       ) -> (np.ndarray, np.ndarray):
     """
     Pick random pixels from a slice.
 
@@ -161,8 +160,8 @@ def pick_random_pixels(
         stack of binary images
     slice_idx : int
         value indicating one slice of the input volume
-    number_of_pixels : int, optional
-        number of random pixels to pick; the default is 10
+    number_of_pixels : int
+        number of random pixels to pick
 
     Returns
     -------
@@ -190,3 +189,37 @@ def pick_random_pixels(
     #                                            to be removed
 
     return (x_pixels, y_pixels)
+
+
+def create_seed_list(x_pixels: np.ndarray, y_pixels: np.ndarray,
+                     slice_idx: int, number_of_pixels: int
+                     ) -> list:
+    """
+    Reshape the output of pick_random_pixels into the form of a seed list.
+
+    Parameters
+    ----------
+    x_pixels : np.ndarray
+        x-coordinates of the picked pixels
+    y_pixels : np.ndarray
+        y-coordinates of the picked pixels
+    slice_idx : int
+        value indicating one slice of the input volume; it must be the same
+        passed to pick_random_pixels
+    number_of_pixels : int
+        number of random pixels to pick; it must be the same passed to
+        pick_random_pixels
+
+    Returns
+    -------
+    seed_list : list
+        list of pixels to be used as region growing initial seeds
+
+    """
+    x_pixels = x_pixels.reshape(number_of_pixels, 1)
+    y_pixels = y_pixels.reshape(number_of_pixels, 1)
+    seed_slice = np.repeat(
+        slice_idx, number_of_pixels).reshape(number_of_pixels, 1)
+
+    seed_list = np.concatenate([x_pixels, y_pixels, seed_slice], axis=1)
+    return seed_list.tolist()
