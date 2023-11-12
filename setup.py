@@ -8,12 +8,12 @@ __email__ = 'simone.chiarella@studio.unibo.it'
 from setuptools import setup
 
 setup(
-    name='liver',
+    name='LiverExtraction',
     version='0.1.0',
-    packages=['liver'],
+    packages=['LiverExtraction'],
     # install_requires = ["required_package", ],
     entry_points={
         'console_scripts': [
-            'liver = liver.__main__:main',
+            'LiverExtraction = LiverExtraction.__main__:main',
         ]
     })
