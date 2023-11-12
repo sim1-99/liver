@@ -61,22 +61,8 @@ def write_volume(img, output_file_name):
     output_file_name : str
         name to give to the output file
 
-    Example
-    -------
-    >>> from CTLungSeg.utils import read_image, write_volume
-    >>>
-    >>> input_file = 'path/ti/input/image'
-    >>> image = read_image(input_file)
-    >>> # process the image
-    >>> # write the image as nrrd
-    >>> output_name = 'path/to/output/filename.nrrd'
-    >>> write_volume(image, output_name)
-    >>> #or write the image as nifti
-    >>>  output_name = 'path/to/output/filename.nii'
-    >>> write_volume(image, output_name)
     """
     writer = sitk.ImageFileWriter()
     writer.SetFileName(output_file_name)
-    writer.Execute(image)
-    
+    writer.Execute(img)
     
