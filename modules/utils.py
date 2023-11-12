@@ -16,51 +16,67 @@ import shutil
 import SimpleITK as sitk
 
 
-def read_zipped_nifti(file_idx: int):
+def read_zipped_nifti(archive_name: str, file_name: str):
     """
     Read .nii files from a .zip archive.
 
     The path to the files must be:
 
-    . > liver > LiTS_data.zip > LiTS_data > volumes       > volume-0.nii
-                                          > segmentations > segmentation-0.nii
-
-    TODO: give the possibility to pass from CL a different archive
-    TODO: remove the part of the segmentation after development stage
+    . > liver > archive.zip > file.nii
 
     Parameters
     ----------
-    file_idx : int
-        index of the file to read
+    archive_name : str
+        name of the .zip archive
+    file_name : str
+        name of the file to read
 
     Returns
     -------
-    vol: SimpleITK image
-        stack of CT images to read
-    seg: SimpleITK image
-        stack of segmentation images to read
+    file: SimpleITK image
+        stack of images to read
 
     """
     temp_dir = Path.home()/'liver'/'temp'
-    myzip_path = Path.home()/'liver'/'LiTS_data.zip'
-
-    vol_dir = Path('LiTS_data')/'volumes'
-    vol_file_name = 'volume-' + file_idx + '.nii'
-    vol_path = vol_dir/vol_file_name
-    vol_path = str(vol_path)
-
-    seg_dir = Path('LiTS_data')/'segmentations'
-    seg_file_name = 'segmentation-' + file_idx + '.nii'
-    seg_path = seg_dir/seg_file_name
-    seg_path = str(seg_path)
+    myzip_path = Path.home()/'liver'/archive_name
 
     with zipfile.ZipFile(myzip_path) as myzip:
-        myzip.extract(vol_path, path=temp_dir)
-        myzip.extract(seg_path, path=temp_dir)
+        myzip.extract(file_name, path=temp_dir)
 
-    vol = sitk.ReadImage(temp_dir/vol_path, imageIO='NiftiImageIO')
-    seg = sitk.ReadImage(temp_dir/seg_path, imageIO='NiftiImageIO')
+    file = sitk.ReadImage(temp_dir/file_name, imageIO='NiftiImageIO')
 
     shutil.rmtree(temp_dir)
 
-    return (vol, seg)
+    return file
+
+
+def write_volume(img, output_file_name):
+    """
+    Write the image in any format supported by SimpleITK.
+
+    Parameters
+    ----------
+    img : SimpleITk image file
+        image to write
+    output_file_name : str
+        name to give to the output file
+
+    Example
+    -------
+    >>> from CTLungSeg.utils import read_image, write_volume
+    >>>
+    >>> input_file = 'path/ti/input/image'
+    >>> image = read_image(input_file)
+    >>> # process the image
+    >>> # write the image as nrrd
+    >>> output_name = 'path/to/output/filename.nrrd'
+    >>> write_volume(image, output_name)
+    >>> #or write the image as nifti
+    >>>  output_name = 'path/to/output/filename.nii'
+    >>> write_volume(image, output_name)
+    """
+    writer = sitk.ImageFileWriter()
+    writer.SetFileName(output_file_name)
+    writer.Execute(image)
+    
+    
