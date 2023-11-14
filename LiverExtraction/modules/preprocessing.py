@@ -69,7 +69,7 @@ def mean_filter(img, radius: int):
 
 def threshold(img, upper: int, lower: int, inside: int = 1, outside: int = 0):
     """
-    Apply an interval threshold to the input image.
+    Perform interval thresholding on the input image.
 
     Parameters
     ----------

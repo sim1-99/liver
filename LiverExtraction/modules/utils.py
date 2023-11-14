@@ -65,4 +65,3 @@ def write_volume(img, output_file_name):
     writer = sitk.ImageFileWriter()
     writer.SetFileName(output_file_name)
     writer.Execute(img)
-    
