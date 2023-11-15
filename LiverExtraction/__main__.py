@@ -79,12 +79,15 @@ def parse_args():
 def main():
     """Run the script chosen by the user."""
     args = parse_args()
+    input_vol = read_zipped_nifti(archive_name=args.input_arch,
+                                  file_name=args.input_file)
 
     if args.subparser == 'osrg':
-        one_seed_rg.main(args)
+        output_vol = one_seed_rg.main(input_vol)
     if args.subparser == 'msrg':
-        multi_seed_rg.main(args)
-    # write_volume(image=labels, output_filename=args.output)
+        output_vol = multi_seed_rg.main(input_vol)
+
+    write_volume(img=output_vol, output_file_name=args.output)
 
 
 if __name__ == '__main__':
