@@ -29,48 +29,42 @@ def parse_args():
     description = 'Liver Extraction'
     parser = argparse.ArgumentParser(description=description)
 
-    subparsers = parser.add_subparsers(help='possible actions',
-                                       dest='subparser')
+    subparsers = parser.add_subparsers(
+        dest='subparser', help='possible actions')
 
-    osrg = subparsers.add_parser('osrg', help='one seed region growing')
-    osrg.add_argument('--input_archive',
-                      dest='input_arch',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='input archive name')
-    osrg.add_argument('--input_file',
-                      dest='input_file',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='input file name')
-    osrg.add_argument('--output',
-                      dest='output',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='output file name')
+    osrg = subparsers.add_parser('osrg', help='one-seed based region growing')
+    # positional arguments
+    osrg.add_argument('input_archive',
+                      required=True, type=str,
+                      help='name of the input archive')
+    osrg.add_argument('input_file',
+                      required=True, type=str,
+                      help='name of the input file')
+    osrg.add_argument('output',
+                      required=True, type=str,
+                      help='name of the output file')
+    # optional arguments
+    osrg.add_argument('-gt', '--ground_truth',
+                      action='append', nargs=2, type='str',
+                      help='name of the ground truth segmentation archive and '
+                      'file')
 
-    msrg = subparsers.add_parser('msrg', help='multiple seeds region growing')
-    msrg.add_argument('--input_archive',
-                      dest='input_arch',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='input archive name')
-    msrg.add_argument('--input_file',
-                      dest='input_file',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='input file name')
-    msrg.add_argument('--output',
-                      dest='output',
-                      required=True,
-                      type=str,
-                      action='store',
-                      help='output file name')
+    msrg = subparsers.add_parser(
+        'msrg', help='multiple-seeds based region growing')
+    msrg.add_argument('input_archive',
+                      required=True, type=str,
+                      help='name of the input archive')
+    msrg.add_argument('input_file',
+                      required=True, type=str,
+                      help='name of the input file')
+    msrg.add_argument('output',
+                      required=True, type=str,
+                      help='name of the output file')
+    # optional arguments
+    msrg.add_argument('-gt', '--ground_truth',
+                      action='append', nargs=2, type='str',
+                      help='name of the ground truth segmentation archive and '
+                      'file')
 
     args = parser.parse_args()
     return args
@@ -79,11 +73,15 @@ def parse_args():
 def main():
     """Run the script chosen by the user."""
     args = parse_args()
-    input_vol = read_zipped_nifti(archive_name=args.input_arch,
+    input_vol = read_zipped_nifti(archive_name=args.input_archive,
                                   file_name=args.input_file)
 
+    if args.ground_truth is not None:
+        ground_truth = read_zipped_nifti(archive_name=args.ground_truth[0],
+                                         file_name=args.ground_truth[1])
+
     if args.subparser == 'osrg':
-        output_vol = one_seed_rg.main(input_vol)
+        output_vol = one_seed_rg.main(input_vol, ground_truth)
     if args.subparser == 'msrg':
         output_vol = multi_seed_rg.main(input_vol)
 
