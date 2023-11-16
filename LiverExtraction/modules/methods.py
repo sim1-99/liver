@@ -49,7 +49,7 @@ def find_biggest_mask(img) -> int:
     return biggest_mask_slice_idx
 
 
-def find_centroid(img, mask, slice_idx: int) -> (int, int):
+def find_centroid(img, slice_idx: int) -> (int, int):
     """
     Find the centroid of the liver connected component.
 
@@ -62,8 +62,6 @@ def find_centroid(img, mask, slice_idx: int) -> (int, int):
     ----------
     img : SimpleITK image
         stack of thresholded images
-    mask : SimpleITK image              # FIXME: just for development purpose
-        stack of ground truth images
     slice_idx : int
         value indicating one slice of the input volume
 
@@ -82,12 +80,6 @@ def find_centroid(img, mask, slice_idx: int) -> (int, int):
 
     x_centroid = centroids[liver_label][0]
     y_centroid = centroids[liver_label][1]
-
-    # FIXME: remove the following 4 lines when no need of visualizing
-    plt.figure(figsize=(8, 8))
-    plt.imshow(sitk.GetArrayFromImage(mask)[slice_idx, :, :], cmap='gray')
-    plt.scatter(x_centroid, y_centroid, s=30, c='red', marker='o')
-    plt.show()
 
     x_centroid = np.uint32(x_centroid).item()
     y_centroid = np.uint32(y_centroid).item()
