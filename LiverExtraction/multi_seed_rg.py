@@ -20,7 +20,7 @@ from LiverExtraction.modules.utils import plt_show
 
 def main(input_volume, segmentation, slice_where_to_pick_seeds: int):
     """
-    Perform multiple-seed based region growing for the extraction of the liver.
+    Perform multiple-seed based region growing for extracting the liver.
 
     Parameters
     ----------

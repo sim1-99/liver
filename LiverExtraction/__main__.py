@@ -51,6 +51,7 @@ def parse_args():
 
     msrg = subparsers.add_parser(
         'msrg', help='multiple-seeds based region growing')
+    # positional arguments
     msrg.add_argument('input_archive',
                       required=True, type=str,
                       help='name of the input archive')
@@ -73,19 +74,22 @@ def parse_args():
 def main():
     """Run the script chosen by the user."""
     args = parse_args()
-    input_vol = read_zipped_nifti(archive_name=args.input_archive,
-                                  file_name=args.input_file)
+    input_volume = read_zipped_nifti(archive_name=args.input_archive,
+                                     file_name=args.input_file)
 
     if args.ground_truth is not None:
         ground_truth = read_zipped_nifti(archive_name=args.ground_truth[0],
                                          file_name=args.ground_truth[1])
 
     if args.subparser == 'osrg':
-        output_vol = one_seed_rg.main(input_vol, ground_truth)
+        segmentation, _ = one_seed_rg.main(input_volume, ground_truth)
     if args.subparser == 'msrg':
-        output_vol = multi_seed_rg.main(input_vol)
+        segmentation, slice_where_to_pick_seeds = one_seed_rg.main(
+            input_volume, ground_truth)
+        segmentation = multi_seed_rg.main(
+            input_volume, segmentation, slice_where_to_pick_seeds)
 
-    write_volume(img=output_vol, output_file_name=args.output)
+    write_volume(img=segmentation, output_file_name=args.output)
 
 
 if __name__ == '__main__':
