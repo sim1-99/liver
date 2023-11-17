@@ -35,6 +35,7 @@ def crop_right_half(img):
     elif img.GetDimension() == 3:
         filter.SetLowerBoundaryCropSize([0, 0, 0])
         filter.SetUpperBoundaryCropSize([256, 0, 0])
+
     return filter.Execute(img)
 
 
@@ -64,6 +65,7 @@ def mean_filter(img, radius: int):
         raise ValueError('Radius must be greater than or equal to 1.')
     filter = sitk.MeanImageFilter()
     filter.SetRadius(int(radius))
+
     return filter.Execute(img)
 
 
@@ -97,6 +99,7 @@ def threshold(img, upper: int, lower: int, inside: int = 1, outside: int = 0):
     thr.SetUpperThreshold(upper)
     thr.SetOutsideValue(outside)
     thr.SetInsideValue(inside)
+
     return thr.Execute(img)
 
 
@@ -160,6 +163,7 @@ def sigmoid_filter(img, slice_idx: int, pixel: list):
     filter.SetOutputMaximum(input_max)
     filter.SetAlpha(alpha)
     filter.SetBeta(beta)
+
     return filter.Execute(img)
 
 
@@ -220,6 +224,7 @@ def binary_opening(img, radius: int):
         raise ValueError('Radius must be greater than or equal to 1.')
     filter.SetKernelType(sitk.sitkBall)
     filter.SetKernelRadius(int(radius))
+
     return filter.Execute(img)
 
 
@@ -253,6 +258,7 @@ def binary_closing(img, radius: int):
         raise ValueError('Radius must be greater than or equal to 1.')
     filter.SetKernelType(sitk.sitkBall)
     filter.SetKernelRadius(int(radius))
+
     return filter.Execute(img)
 
 
@@ -286,6 +292,7 @@ def binary_closing_br(img, radius: int):
         raise ValueError('Radius must be greater than or equal to 1.')
     filter.SetKernelType(sitk.sitkBall)
     filter.SetKernelRadius(int(radius))
+
     return filter.Execute(img)
 
 
@@ -318,8 +325,7 @@ def erode(img, radius: int, iters: int = 1):
         raise ValueError('Radius must be greater than or equal to 1.')
     filter.SetKernelType(sitk.sitkBall)
     filter.SetKernelRadius(int(radius))
-
-    for iteration in range(iters):
+    for iter in range(iters):
         img = filter.Execute(img)
 
     return img
@@ -346,7 +352,7 @@ def mask_filter(img, mask):
         sample_slice = sitk.GetArrayFromImage(img)
     elif img.GetDimension() == 3:
         sample_slice = sitk.GetArrayFromImage(img)[0, :, :]
-    # which slice is not relevant
+    # 0 just because the slice is not relevant
 
     filter = sitk.MaskImageFilter()
     filter.SetMaskingValue(0.)

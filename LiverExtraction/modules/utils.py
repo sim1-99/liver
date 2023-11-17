@@ -44,9 +44,7 @@ def read_zipped_nifti(archive_name: str, file_name: str):
 
     with zipfile.ZipFile(myzip_path) as myzip:
         myzip.extract(file_name, path=temp_dir)
-
     file = sitk.ReadImage(temp_dir/file_name, imageIO='NiftiImageIO')
-
     shutil.rmtree(temp_dir)
 
     return file
