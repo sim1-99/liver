@@ -12,7 +12,6 @@ __email__ = 'simone.chiarella@studio.unibo.it'
 
 import SimpleITK as sitk
 import numpy as np
-import pylab as plt
 import cv2
 
 
@@ -46,6 +45,7 @@ def find_biggest_mask(img) -> int:
         if (np.count_nonzero(np_img) > biggest_mask_area):
             biggest_mask_area = np.count_nonzero(np_img)
             biggest_mask_slice_idx = slice
+
     return biggest_mask_slice_idx
 
 
@@ -134,24 +134,23 @@ def region_growing(img, seed: list, multiplier: float, radius: int,
     connectivity_mask = sitk.ConfidenceConnected(
         img, seedList=seed, numberOfIterations=iters,
         multiplier=multiplier, initialNeighborhoodRadius=radius)
+
     return sitk.Cast(connectivity_mask, sitk.sitkUInt8)
 
 
-def pick_random_pixels(img, slice_idx: int, number_of_pixels: int
+def pick_random_pixels(img, number_of_pixels: int
                        ) -> (np.ndarray, np.ndarray):
     """
     Pick random pixels from a slice.
 
     This function is used to pick a variable number of random pixels in the
-    slice of the input volume specified by 'slice_idx'. Those pixels will be
-    successively used as initial seeds for the region growing algorithm.
+    input binary image. Those pixels will be successively used as initial
+    seeds for the region growing algorithm.
 
     Parameters
     ----------
     img : SimpleITK image
-        stack of binary images
-    slice_idx : int
-        value indicating one slice of the input volume
+        binary image where to pick the pixels
     number_of_pixels : int
         number of random pixels to pick
 
@@ -161,6 +160,8 @@ def pick_random_pixels(img, slice_idx: int, number_of_pixels: int
         x-coordinates of the picked pixels
     y_pixels : np.ndarray
         y-coordinates of the picked pixels
+    component : np.ndarray
+        2D array containing the connected component corresponding to the liver
 
     """
     img = sitk.GetArrayFromImage(img)
@@ -177,27 +178,17 @@ def pick_random_pixels(img, slice_idx: int, number_of_pixels: int
     x_pixels = non_zero_pixels[1, random_idx]
     y_pixels = non_zero_pixels[0, random_idx]
 
-    plt.imshow(component, cmap='gray')  # FIXME: for development purpose,
-    #                                            to be removed
-
-    return (x_pixels, y_pixels)
+    return (x_pixels, y_pixels, component)
 
 
-def create_seed_list(x_pixels: np.ndarray, y_pixels: np.ndarray,
-                     slice_idx: int, number_of_pixels: int
-                     ) -> list:
+def create_seed_list(coords: list, number_of_pixels: int) -> list:
     """
     Reshape the output of pick_random_pixels into the form of a seed list.
 
     Parameters
     ----------
-    x_pixels : np.ndarray
-        x-coordinates of the picked pixels
-    y_pixels : np.ndarray
-        y-coordinates of the picked pixels
-    slice_idx : int
-        value indicating one slice of the input volume; it must be the same
-        passed to pick_random_pixels
+    coords : list
+        x-, y- and z-coordinates of the picked pixels
     number_of_pixels : int
         number of random pixels to pick; it must be the same passed to
         pick_random_pixels
@@ -208,10 +199,11 @@ def create_seed_list(x_pixels: np.ndarray, y_pixels: np.ndarray,
         list of pixels to be used as region growing initial seeds
 
     """
-    x_pixels = x_pixels.reshape(number_of_pixels, 1)
-    y_pixels = y_pixels.reshape(number_of_pixels, 1)
-    seed_slice = np.repeat(
-        slice_idx, number_of_pixels).reshape(number_of_pixels, 1)
+    coords[0] = coords[0].reshape(number_of_pixels, 1)
+    coords[1] = coords[1].reshape(number_of_pixels, 1)
+    coords[2] = np.repeat(
+        coords[2], number_of_pixels).reshape(number_of_pixels, 1)
 
-    seed_list = np.concatenate([x_pixels, y_pixels, seed_slice], axis=1)
-    return seed_list.tolist()
+    seed_list = np.concatenate([coords[0], coords[1], coords[2]], axis=1)
+
+    return (seed_list.tolist())
