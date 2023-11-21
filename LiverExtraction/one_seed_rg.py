@@ -29,6 +29,8 @@ def main(input_volume, ground_truth=None):
 
     Returns
     -------
+    seg_vol : SimpleITK image
+        segmented CT volume
     rg_seg : SimpleITK image
         stack of segmented images
     slice_of_the_largest_mask: int
@@ -61,4 +63,6 @@ def main(input_volume, ground_truth=None):
     rg_seg = pp.binary_closing_br(rg_seg, radius=10)
     rg_seg = pp.binary_closing(rg_seg, radius=3)
 
-    return (rg_seg, slice_of_the_largest_mask)
+    seg_vol = pp.mask_filter(input_volume, rg_seg)
+
+    return (seg_vol, rg_seg, slice_of_the_largest_mask)

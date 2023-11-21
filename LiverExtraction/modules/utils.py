@@ -50,7 +50,7 @@ def read_zipped_nifti(archive_name: str, file_name: str):
     return file
 
 
-def plt_show(img, pixel_coord: list = None):
+def plt_show(img, pixel_coord: list = None) -> None:
     """
     Show NumPy arrays and SimpleITK images using Matplotlib.
 
@@ -60,7 +60,11 @@ def plt_show(img, pixel_coord: list = None):
         image or stack of images to visualize
     pixel_coord : list, optional
         list containing the coordinates of possible points to display on the
-        image; the default is None.
+        image; the default is None
+
+    Returns
+    -------
+    None
 
     """
     if pixel_coord is None:
@@ -77,9 +81,12 @@ def plt_show(img, pixel_coord: list = None):
         plt.show()
 
 
-def write_volume(img, output_file_name):
+def write_volume(img, output_file_name, save_binary=False) -> None:
     """
     Write the image in any format supported by SimpleITK.
+
+    If save_binary is set to True, then the indication '_binary' is added to
+    the file name before the file format.
 
     Parameters
     ----------
@@ -87,8 +94,20 @@ def write_volume(img, output_file_name):
         image to write
     output_file_name : str
         name to give to the output file
+    save_binary : bool, optional
+        if True, the string '_binary' is added to the file name before the
+        file format; the default is False
+
+    Returns
+    -------
+    None
 
     """
     writer = sitk.ImageFileWriter()
-    writer.SetFileName(output_file_name)
+    if save_binary is True:
+        file_name = output_file_name.split('.')[0]
+        file_format = output_file_name.split('.')[1]
+        writer.SetFileName(file_name+'_binary'+file_format)
+    else:
+        writer.SetFileName(output_file_name)
     writer.Execute(img)
