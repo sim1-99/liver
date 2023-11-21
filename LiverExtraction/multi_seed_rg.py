@@ -35,7 +35,7 @@ def main(input_volume, segmentation, slice_where_to_pick_seeds: int):
 
     Returns
     -------
-    seg_volume : SimpleITK image
+    seg_vol : SimpleITK image
         segmented CT volume
     rg_seg : SimpleITK image
         segmentation mask of the CT volume
@@ -67,6 +67,6 @@ def main(input_volume, segmentation, slice_where_to_pick_seeds: int):
         vol, seed_list, multiplier=2.5, initialNeighborhoodRadius=0)
     rg_seg = pp.binary_opening(rg_seg, radius=2)
 
-    seg_volume = pp.mask_filter(input_volume, rg_seg)
+    seg_vol = pp.mask_filter(input_volume, rg_seg)
 
-    return (seg_volume, rg_seg)
+    return (seg_vol, rg_seg)

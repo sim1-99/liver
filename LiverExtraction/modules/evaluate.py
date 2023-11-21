@@ -14,11 +14,11 @@ import numpy as np
 from medpy.metric.binary import dc, jc, obj_assd
 
 
-def evaluate(seg, gt) -> (float, float, float, float, float):
+def evaluate(seg, gt) -> list:
     """
     Evaluate the segmentation.
 
-    Calculate the following quantities for the evaluation of the segmenation,
+    Calculate the following parameters for the evaluation of the segmenation,
     by comparing it with a ground truth segmentation:
         - volumetric overlap error (VOE)
         - relative volume difference (RVD)
@@ -35,8 +35,9 @@ def evaluate(seg, gt) -> (float, float, float, float, float):
 
     Returns
     -------
-    (float, float, float, float, float)
-        VOE, RVD, Dice coefficient, Jaccard index, ASSD
+    params : list
+        list of floats containing the evaluation parameters: VOE, RVD,
+        Dice coefficient, Jaccard index, ASSD
 
     """
     gt = gt == 1  # here I choose as ground truth mask only the helthy liver
@@ -52,17 +53,18 @@ def evaluate(seg, gt) -> (float, float, float, float, float):
     assd = obj_assd(seg, gt)
 
     voe, assd = np.float64(voe).item(), np.float64(assd).item()
+    params = [voe, rvd, dice, jaccard, assd]
 
-    return (voe, rvd, dice, jaccard, assd)
+    return params
 
 
-def print_evaluate(evals) -> None:
+def print_evaluate(params) -> None:
     """
     Print the output of evaluate.
 
     Parameters
     ----------
-    evals : list
+    params : list
         evaluation parameters
 
     Returns
@@ -70,8 +72,8 @@ def print_evaluate(evals) -> None:
     None
 
     """
-    print(f"VOE: {evals[0]}"
-          f"RVD: {evals[1]}"
-          f"Dice coefficient: {evals[2]}"
-          f"Jaccard index: {evals[3]}"
-          f"ASD: {evals[4]}")
+    print(f'VOE: {params[0]}'
+          f'RVD: {params[1]}'
+          f'Dice coefficient: {params[2]}'
+          f'Jaccard index: {params[3]}'
+          f'ASD: {params[4]}')
