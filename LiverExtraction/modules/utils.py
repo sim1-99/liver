@@ -18,6 +18,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def plt_show(img, pixel_coord: list = None) -> None:
+    """
+    Show NumPy arrays and SimpleITK images using Matplotlib.
+
+    Parameters
+    ----------
+    img : np.ndarray or SimpleITK image
+        image or stack of images to visualize
+    pixel_coord : list, optional
+        list containing the coordinates of possible points to display on the
+        image; the default is None
+
+    Returns
+    -------
+    None
+
+    """
+    if pixel_coord is None:
+        if img is np.ndarray:
+            plt.imshow(img, cmap='gray')
+        else:
+            plt.imshow(sitk.GetArrayFromImage(img), cmap='gray')
+    elif img.GetDimension() == 3:
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
+        plt.imshow(
+            sitk.GetArrayFromImage(img)[pixel_coord[2], :, :], cmap='gray')
+        plt.scatter(
+            pixel_coord[0], pixel_coord[1], s=30, c='red', marker='o')
+        plt.show()
+
+
 def read_zipped_nifti(archive_name: str, file_name: str):
     """
     Read .nii files from a .zip archive.
@@ -48,37 +79,6 @@ def read_zipped_nifti(archive_name: str, file_name: str):
     shutil.rmtree(temp_dir)
 
     return file
-
-
-def plt_show(img, pixel_coord: list = None) -> None:
-    """
-    Show NumPy arrays and SimpleITK images using Matplotlib.
-
-    Parameters
-    ----------
-    img : np.ndarray or SimpleITK image
-        image or stack of images to visualize
-    pixel_coord : list, optional
-        list containing the coordinates of possible points to display on the
-        image; the default is None
-
-    Returns
-    -------
-    None
-
-    """
-    if pixel_coord is None:
-        if img is np.ndarray:
-            plt.imshow(img, cmap='gray')
-        else:
-            plt.imshow(sitk.GetArrayFromImage(img), cmap='gray')
-    elif img.GetDimension() == 3:
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
-        plt.imshow(
-            sitk.GetArrayFromImage(img)[pixel_coord[2], :, :], cmap='gray')
-        plt.scatter(
-            pixel_coord[0], pixel_coord[1], s=30, c='red', marker='o')
-        plt.show()
 
 
 def write_volume(img, output_file_name, save_binary=False) -> None:
