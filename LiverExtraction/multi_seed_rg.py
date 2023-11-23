@@ -16,7 +16,7 @@ __email__ = 'simone.chiarella@studio.unibo.it'
 import LiverExtraction.modules.preprocessing as pp
 import LiverExtraction.modules.methods as mt
 from LiverExtraction.modules.utils import plt_show
-
+import numpy as np
 
 def main(input_volume, segmentation, slice_where_to_pick_seeds: int):
     """
@@ -63,8 +63,7 @@ def main(input_volume, segmentation, slice_where_to_pick_seeds: int):
     plt_show(liver_conn_comp)
     plt_show(input_volume, pixel_coords)
 
-    rg_seg = mt.region_growing(
-        vol, seed_list, multiplier=2.5, initialNeighborhoodRadius=0)
+    rg_seg = mt.region_growing(vol, seed_list, multiplier=2.5, radius=0)
     rg_seg = pp.binary_opening(rg_seg, radius=2)
 
     seg_vol = pp.mask_filter(input_volume, rg_seg)

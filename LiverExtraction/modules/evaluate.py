@@ -72,8 +72,8 @@ def print_evaluate(params) -> None:
     None
 
     """
-    print(f'VOE: {params[0]}'
-          f'RVD: {params[1]}'
-          f'Dice coefficient: {params[2]}'
-          f'Jaccard index: {params[3]}'
-          f'ASD: {params[4]}')
+    print('VOE: {:03.1f}'.format(params[0]),
+          '\nRVD: {:03.1f}'.format(params[1]),
+          '\nDice coefficient: {:03.2f}'.format(params[2]),
+          '\nJaccard index: {:03.2f}'.format(params[3]),
+          '\nASD: {:03.1f}'.format(params[4]))

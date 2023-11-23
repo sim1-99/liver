@@ -6,6 +6,7 @@ __author__ = 'Simone Chiarella'
 __email__ = 'simone.chiarella@studio.unibo.it'
 
 import argparse
+import sys
 from LiverExtraction.modules.utils import read_zipped_nifti, write_volume
 from LiverExtraction.modules.evaluate import evaluate, print_evaluate
 from LiverExtraction import one_seed_rg
@@ -36,17 +37,14 @@ def parse_args():
     osrg = subparsers.add_parser('osrg', help='one-seed based region growing')
     # positional arguments
     osrg.add_argument('input_archive',
-                      required=True, type=str,
-                      help='name of the input archive')
+                      type=str, help='name of the input archive')
     osrg.add_argument('input_file',
-                      required=True, type=str,
-                      help='name of the input file')
+                      type=str, help='name of the input file')
     osrg.add_argument('output',
-                      required=True, type=str,
-                      help='name of the output file')
+                      type=str, help='name of the output file')
     # optional arguments
     osrg.add_argument('-gt', '--ground_truth',
-                      action='append', nargs=2, type='str',
+                      action='extend', nargs=2, type=str,
                       help='name of the ground truth segmentation archive and '
                       'file')
     osrg.add_argument('-sb', '--save_binary',
@@ -57,17 +55,14 @@ def parse_args():
         'msrg', help='multiple-seeds based region growing')
     # positional arguments
     msrg.add_argument('input_archive',
-                      required=True, type=str,
-                      help='name of the input archive')
+                      type=str, help='name of the input archive')
     msrg.add_argument('input_file',
-                      required=True, type=str,
-                      help='name of the input file')
+                      type=str, help='name of the input file')
     msrg.add_argument('output',
-                      required=True, type=str,
-                      help='name of the output file')
+                      type=str, help='name of the output file')
     # optional arguments
     msrg.add_argument('-gt', '--ground_truth',
-                      action='append', nargs=2, type='str',
+                      action='extend', nargs=2, type=str,
                       help='name of the ground truth segmentation archive and '
                       'file')
     msrg.add_argument('-sb', '--save_binary',
@@ -81,9 +76,14 @@ def parse_args():
 def main():
     """Run the script chosen by the user."""
     args = parse_args()
+
+    if len(sys.argv) == 1:
+        sys.exit()
+
     input_volume = read_zipped_nifti(archive_name=args.input_archive,
                                      file_name=args.input_file)
 
+    ground_truth = None
     if args.ground_truth is not None:
         ground_truth = read_zipped_nifti(archive_name=args.ground_truth[0],
                                          file_name=args.ground_truth[1])
@@ -92,10 +92,10 @@ def main():
         seg_volume, seg_binary, _ = one_seed_rg.main(
             input_volume, ground_truth)
     if args.subparser == 'msrg':
-        seg_volume, _, slice_where_to_pick_seeds = one_seed_rg.main(
+        seg_volume, seg_binary, slice_where_to_pick_seeds = one_seed_rg.main(
             input_volume, ground_truth)
         seg_volume, seg_binary = multi_seed_rg.main(
-            input_volume, seg_volume, slice_where_to_pick_seeds)
+            input_volume, seg_binary, slice_where_to_pick_seeds)
 
     if args.ground_truth is not None:
         params = evaluate(seg_binary, ground_truth)

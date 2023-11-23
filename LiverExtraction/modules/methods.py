@@ -15,17 +15,17 @@ import numpy as np
 import cv2
 
 
-def create_seed_list(coords: list, number_of_pixels: int) -> list:
+def create_seed_list(coords: list, number_of_pixels: int = None) -> list:
     """
-    Reshape the output of pick_random_pixels into the form of a seed list.
+    Reshape a list containing pixel coordinates into the form of a seed list.
 
     Parameters
     ----------
     coords : list
-        x-, y- and z-coordinates of the picked pixels
-    number_of_pixels : int
-        number of random pixels to pick; it must be the same passed to
-        pick_random_pixels
+        x-, y- and z-coordinates of the pixels
+    number_of_pixels : int, optional
+        number of random pixels to put into the list; if present, it must be
+        the same passed to pick_random_pixels
 
     Returns
     -------
@@ -33,14 +33,16 @@ def create_seed_list(coords: list, number_of_pixels: int) -> list:
         list of pixels to be used as region growing initial seeds
 
     """
-    coords[0] = coords[0].reshape(number_of_pixels, 1)
-    coords[1] = coords[1].reshape(number_of_pixels, 1)
-    coords[2] = np.repeat(
-        coords[2], number_of_pixels).reshape(number_of_pixels, 1)
-
-    seed_list = np.concatenate([coords[0], coords[1], coords[2]], axis=1)
-
-    return (seed_list.tolist())
+    if number_of_pixels:
+        coords[0] = coords[0].reshape(number_of_pixels, 1)
+        coords[1] = coords[1].reshape(number_of_pixels, 1)
+        coords[2] = np.repeat(
+            coords[2], number_of_pixels).reshape(number_of_pixels, 1)
+        seed_list = np.concatenate([coords[0], coords[1], coords[2]], axis=1)
+        seed_list = seed_list.tolist()
+    else:
+        seed_list = [(coords[0], coords[1], coords[2])]
+    return seed_list
 
 
 def find_biggest_mask(img) -> int:
@@ -101,6 +103,7 @@ def find_centroid(img, slice_idx: int) -> (int, int):
         y-coordinate of the centroid of the liver connected component
 
     """
+    img = sitk.GetArrayFromImage(img)[slice_idx, :, :]
     output = cv2.connectedComponentsWithStats(img, 4, cv2.CV_32S)
     (numLabels, labels, stats, centroids) = output
 
@@ -116,7 +119,7 @@ def find_centroid(img, slice_idx: int) -> (int, int):
 
 
 def pick_random_pixels(img, number_of_pixels: int
-                       ) -> (np.ndarray, np.ndarray):
+                       ) -> (np.ndarray, np.ndarray, np.ndarray):
     """
     Pick random pixels from a slice.
 
@@ -142,7 +145,6 @@ def pick_random_pixels(img, number_of_pixels: int
 
     """
     img = sitk.GetArrayFromImage(img)
-
     output = cv2.connectedComponentsWithStats(img, 4, cv2.CV_32S)
     (numLabels, labels, stats, centroids) = output
 
@@ -205,5 +207,4 @@ def region_growing(img, seed: list, multiplier: float, radius: int,
     connectivity_mask = sitk.ConfidenceConnected(
         img, seedList=seed, numberOfIterations=iters,
         multiplier=multiplier, initialNeighborhoodRadius=radius)
-
     return sitk.Cast(connectivity_mask, sitk.sitkUInt8)

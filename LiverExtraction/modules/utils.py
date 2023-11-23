@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plt_show(img, pixel_coord: list = None) -> None:
+def plt_show(img, pixel_coords: list = None) -> None:
     """
     Show NumPy arrays and SimpleITK images using Matplotlib.
 
@@ -35,17 +35,20 @@ def plt_show(img, pixel_coord: list = None) -> None:
     None
 
     """
-    if pixel_coord is None:
-        if img is np.ndarray:
+    if pixel_coords is None:
+        if type(img) is np.ndarray:
             plt.imshow(img, cmap='gray')
         else:
             plt.imshow(sitk.GetArrayFromImage(img), cmap='gray')
     elif img.GetDimension() == 3:
+        if np.size(pixel_coords) == 3:
+            z_coord = pixel_coords[2]
+        else:
+            z_coord = pixel_coords[2][0][0]
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
-        plt.imshow(
-            sitk.GetArrayFromImage(img)[pixel_coord[2], :, :], cmap='gray')
+        plt.imshow(sitk.GetArrayFromImage(img)[z_coord, :, :], cmap='gray')
         plt.scatter(
-            pixel_coord[0], pixel_coord[1], s=30, c='red', marker='o')
+            pixel_coords[0], pixel_coords[1], s=30, c='red', marker='o')
         plt.show()
 
 

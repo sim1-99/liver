@@ -46,6 +46,7 @@ def main(input_volume, ground_truth=None):
     slice_of_the_largest_mask = mt.find_biggest_mask(vol)
     x_centroid, y_centroid = mt.find_centroid(vol, slice_of_the_largest_mask)
     centroid = [x_centroid, y_centroid, slice_of_the_largest_mask]
+    seed_list = mt.create_seed_list(centroid)
 
     # TODO: visualize just for development purpose
     if ground_truth:
@@ -57,8 +58,7 @@ def main(input_volume, ground_truth=None):
     vol = pp.sigmoid_filter(vol, slice_of_the_largest_mask, centroid)
     vol = pp.histogram_equalization(vol)  # FIX: is it useful?
 
-    rg_seg = mt.region_growing(
-        vol, centroid, multiplier=2.5, initialNeighborhoodRadius=2)
+    rg_seg = mt.region_growing(vol, seed_list, multiplier=2.5, radius=2)
     rg_seg = pp.binary_opening(rg_seg, radius=2)
     rg_seg = pp.binary_closing_br(rg_seg, radius=10)
     rg_seg = pp.binary_closing(rg_seg, radius=3)
